@@ -1,0 +1,66 @@
+version: '3'
+
+services:
+  management_node:
+    container_name: mysql-management-node
+    hostname: mysql-management-node
+    image: mysql/mysql-cluster
+    volumes:
+      #  - ./context/my.cnf:/etc/my.cnf
+       - ./context/mysql-cluster.cnf:/etc/mysql-cluster.cnf
+    command: ndb_mgmd
+    networks:
+      mysql_network:
+
+  data_node_1:
+    container_name: mysql-data-node-1
+    hostname: mysql-data-node-1
+    image: mysql/mysql-cluster
+    volumes:
+       - ./context/my.cnf:/etc/my.cnf
+      #  - ./context/mysql-cluster.cnf:/etc/mysql-cluster.cnf
+    command: ndbd
+    depends_on:
+      - management_node
+    networks:
+      mysql_network:
+
+  data_node_2:
+    container_name: mysql-data-node-2
+    hostname: mysql-data-node-2
+    image: mysql/mysql-cluster
+    volumes:
+       - ./context/my.cnf:/etc/my.cnf
+      #  - ./context/mysql-cluster.cnf:/etc/mysql-cluster.cnf
+    command: ndbd
+    depends_on:
+      - management_node
+    networks:
+      mysql_network:
+
+  sql_node:
+    container_name: mysql-sql-node
+    hostname: mysql-sql-node
+    image: mysql/mysql-cluster
+    ports:
+      - 3306:3306
+    volumes:
+       - ./context/my.cnf:/etc/my.cnf
+      #  - ./context/mysql-cluster.cnf:/etc/mysql-cluster.cnf
+    environment:
+      - MYSQL_ROOT_PASSWORD
+      - MYSQL_DATABASE
+      - MYSQL_USER
+      - MYSQL_PASSWORD
+      - MYSQL_ROOT_HOST
+    command: mysqld --default-authentication-plugin=mysql_native_password
+    depends_on:
+      - management_node
+      - data_node_1
+      - data_node_2
+    networks:
+      mysql_network:
+
+networks:
+  mysql_network:
+    name: mysql-network
