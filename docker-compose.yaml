@@ -6,7 +6,6 @@ services:
     hostname: mysql-management-node
     image: mysql/mysql-cluster
     volumes:
-      #  - ./context/my.cnf:/etc/my.cnf
        - ./context/mysql-cluster.cnf:/etc/mysql-cluster.cnf
     command: ndb_mgmd
     networks:
@@ -18,7 +17,8 @@ services:
     image: mysql/mysql-cluster
     volumes:
        - ./context/my.cnf:/etc/my.cnf
-      #  - ./context/mysql-cluster.cnf:/etc/mysql-cluster.cnf
+    environment:
+      - TZ
     command: ndbd
     depends_on:
       - management_node
@@ -31,7 +31,8 @@ services:
     image: mysql/mysql-cluster
     volumes:
        - ./context/my.cnf:/etc/my.cnf
-      #  - ./context/mysql-cluster.cnf:/etc/mysql-cluster.cnf
+    environment:
+      - TZ
     command: ndbd
     depends_on:
       - management_node
@@ -46,8 +47,8 @@ services:
       - 3306:3306
     volumes:
        - ./context/my.cnf:/etc/my.cnf
-      #  - ./context/mysql-cluster.cnf:/etc/mysql-cluster.cnf
     environment:
+      - TZ
       - MYSQL_ROOT_PASSWORD
       - MYSQL_DATABASE
       - MYSQL_USER
